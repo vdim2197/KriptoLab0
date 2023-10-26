@@ -4,8 +4,8 @@ File: crypto.py
 ---------------
 Assignment 1: Cryptography
 Course: CS 41
-Name: <YOUR NAME>
-SUNet: <SUNet ID>
+Name: Varga Dávid
+SUNet: vdim2197
 
 Replace this with a description of the program.
 """
@@ -18,7 +18,20 @@ def encrypt_caesar(plaintext):
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    encrypted_text = ""
+    for character in plaintext:
+        if character.isalpha():
+            if ord(character) <= 87:
+                new_character = chr(ord(character) + 3)
+            else:
+                new_character = chr(ord(character) - 26 + 3)
+                print(ord(character) - 26 + 3)
+            encrypted_text += new_character
+        else:
+            encrypted_text += character
+
+    return encrypted_text
+    #raise NotImplementedError  # Your implementation here
 
 
 def decrypt_caesar(ciphertext):
@@ -26,17 +39,50 @@ def decrypt_caesar(ciphertext):
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    #raise NotImplementedError  # Your implementation here
+    decrypted_text = ""
+    for character in ciphertext:
+        if character.isalpha():
+            if ord(character) >= 68:
+                new_character = chr(ord(character) - 3)
+            else:
+                new_character = chr(ord(character) + 26 - 3)
+            decrypted_text += new_character
+        else:
+            decrypted_text += character
+
+    return decrypted_text
 
 
 # Vigenere Cipher
+
+def creating_same_length_key(plaintext, keyword):
+    same_length_key = ""
+    length_text = len(plaintext)
+    i = 0
+    j = 0
+    while i < length_text:
+        j = 0
+        while j < len(keyword) and i < length_text:
+            same_length_key += keyword[j]
+            j += 1
+            i += 1
+    return same_length_key
 
 def encrypt_vigenere(plaintext, keyword):
     """Encrypt plaintext using a Vigenere cipher with a keyword.
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    #raise NotImplementedError  # Your implementation here
+    same_length_key = creating_same_length_key(plaintext, keyword)
+    encrypted_text = ""
+    for character_text,character_key in zip(plaintext, same_length_key):
+        new_character = chr((ord(character_text) - 65 + ord(character_key) - 65) % 26 + 65)
+        encrypted_text += new_character
+
+    return encrypted_text
+
 
 
 def decrypt_vigenere(ciphertext, keyword):
@@ -44,7 +90,16 @@ def decrypt_vigenere(ciphertext, keyword):
 
     Add more implementation details here.
     """
-    raise NotImplementedError  # Your implementation here
+    #raise NotImplementedError  # Your implementation here
+    same_length_key = creating_same_length_key(ciphertext, keyword)
+    encrypted_text = ""
+    for character_text,character_key in zip(ciphertext, same_length_key):
+        decrypted_char = chr((ord(character_text) - ord(character_key) + 26) % 26 + 65)
+        encrypted_text += decrypted_char
+
+    return encrypted_text
+
+
 
 
 # Merkle-Hellman Knapsack Cryptosystem
