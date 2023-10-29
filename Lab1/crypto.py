@@ -186,12 +186,12 @@ def decrypt_mh(message, private_key):
 # Scytale Cipher
 def fill_the_gap(plaintext, circumference):
 
-    while(len(plaintext) % circumference != 0):
+    while(len(plaintext) % circumference != 0):         #hogy ha a szoveg hossza nem oszthato a kulccsal akkor hozzateszek a vegehez "_" karaktereket
         plaintext += "_"
 
     return plaintext
 
-def eliminate_the_gap(decrypted):
+def eliminate_the_gap(decrypted):           # dekodolas utan torlom a hozzaadott karaktereket
     newDecrypted = ""
     i = 0
     while decrypted[i] != "_":
@@ -201,20 +201,19 @@ def eliminate_the_gap(decrypted):
 
 def encrypt_scytale(plaintext, circumference):
 
-    #raise NotImplementedError  # Your implementation here
     plaintext = fill_the_gap(plaintext, circumference)
     encrypted = ""
     for i in range(circumference):
-        j = i
+        j = i   #a kezdo pozicio minden sorban fog 1el nonni
         while j < len(plaintext):
-            encrypted += plaintext[j]
-            j = j + circumference
+            encrypted += plaintext[j]   
+            j = j + circumference       #a kulcs erteke szerint veszem a karaktereket
 
     return encrypted
 
 def decrypt_scytale(ciphertext, circumference):
 
-    steps = int(len(ciphertext)/circumference)
+    steps = int(len(ciphertext)/circumference) #kiszamolom, hogy hany betu fer el egy sorban, ez lesz a lepes erteke
     decrypted = ""
     for i in range(steps):
         j = i
@@ -222,5 +221,139 @@ def decrypt_scytale(ciphertext, circumference):
             decrypted += ciphertext[j]
             j = j + steps
     return eliminate_the_gap(decrypted)
+    
+    
+#Railfence Cipher
 
-    #raise NotImplementedError  # Your implementation here
+def create_matrix(n, m):
+    matrix = []
+    for i in range(n):
+        row = ["-"] * m  
+        matrix.append(row)  
+    return matrix
+
+def print_matrix(matrix): #teszteles miatt
+    
+    for row in matrix:
+        print(row)
+
+def building_the_matrix_for_encrypt(plaintext, num_rails):
+
+    m = len(plaintext)              #a matrixnak num_rails sora lesz es annyi oszlopa amennyi karaktert tartalmaz a kodolando szo
+    n = num_rails
+    matrix = create_matrix(n,m)
+    i = 0
+    reachedBottom = 0   #az algoritmusnak megfeleloen atlosan fogom bejarni a matrixot
+    reachedTop = 1
+    currentRow = 0
+    currentColumn = 0
+    while i < m:
+        matrix[currentRow][currentColumn] = plaintext[i]    #sorra atlosan elmentem benne a karaktereket
+        
+        if reachedBottom == 0:          #hogy ha a matrix also soraban vagyok akkor iranyt valtoztatok es felfele megyek
+            if currentRow + 1 < n:
+                currentRow += 1
+                currentColumn += 1
+                i = i + 1
+            else:
+                reachedBottom = 1
+                reachedTop = 0
+
+        if reachedTop == 0:             #hogy ha a matrix elso soraban vagyok ugy hogy mar elertem az also sort akkor iranyt valtoztatok, lefele megyek atlosan
+            if currentRow - 1 >= 0:
+                currentRow -= 1
+                currentColumn +=1
+                i = i + 1
+            else:
+                reachedBottom = 0
+                reachedTop = 1
+
+    return matrix
+
+def building_the_matrix_for_decrypt(ciphertext, num_rails): #a dekriptalashoz is egy matrixot hasznalok amit hasonloan epitek fel
+
+    m = len(ciphertext)
+    n = num_rails
+    matrix = create_matrix(n,m)
+    i = 0
+    reachedBottom = 0
+    reachedTop = 1
+    currentRow = 0
+    currentColumn = 0
+    while i < m:            #a bejaras ugyanugy tortenik mint a felso fuggvenyben, viszont megjegyzem "*" karakterrel azokat a poziciokat ahova a betuk kell keruljenek
+        matrix[currentRow][currentColumn] = "*"
+        
+        if reachedBottom == 0:
+            if currentRow + 1 < n:
+                currentRow += 1
+                currentColumn += 1
+                i = i + 1
+            else:
+                reachedBottom = 1
+                reachedTop = 0
+
+        if reachedTop == 0:
+            if currentRow - 1 >= 0:
+                currentRow -= 1
+                currentColumn +=1
+                i = i + 1
+            else:
+                reachedBottom = 0
+                reachedTop = 1
+
+    position = 0    #amiutan megjegyeztem azt hogy hova kell elhelyezzem a betuket egy egyszeru bejarassal megoldom ezt
+    for i in range(n):
+        for j in range(m):
+            if matrix[i][j] == "*":     
+                matrix[i][j] = ciphertext[position] #a csillag karaktereket helyettesitem sorban a betukkel
+                position +=1
+    return matrix
+
+def encrypt_railfence(plaintext, num_rails):
+    m = len(plaintext)
+    n = num_rails
+    matrix = building_the_matrix_for_encrypt(plaintext, num_rails)  #felepitettem az encypt matrixot
+    print_matrix(matrix)
+    encrypted = ""
+    for row in matrix:
+        for element in row:
+            if element != '-':  # bejarom a matrixot sorrol sorra es a betu karaktereket elmentem az encrypted stringben
+                encrypted += element
+    return encrypted
+
+def decrypt_railfence(ciphertext, num_rails):   # a dekodolas itt tortenik
+    matrix = building_the_matrix_for_decrypt(ciphertext, num_rails) #felepitettem egy encrypt matrixot
+    decrypted = ""
+    i = 0
+    reachedBottom = 0
+    reachedTop = 1
+    currentRow = 0
+    currentColumn = 0
+    m = len(ciphertext)
+    n = num_rails
+    while i < m:    #bejarom atlosan ugyanazzal a logikaval mint az elozo fuggvenykeben
+        
+        
+        if reachedBottom == 0:
+            if currentRow + 1 < n:
+                decrypted += matrix[currentRow][currentColumn]      #az atlos bejaras soran elmentem a betuket a decrypted stringben
+                currentRow += 1
+                currentColumn += 1
+                i = i + 1
+            else:
+                reachedBottom = 1
+                reachedTop = 0
+
+        if reachedTop == 0:
+            if currentRow - 1 >= 0:
+                decrypted += matrix[currentRow][currentColumn]
+                currentRow -= 1
+                currentColumn +=1
+                i = i + 1
+            else:
+                reachedBottom = 0
+                reachedTop = 1
+    return decrypted
+
+    
+
