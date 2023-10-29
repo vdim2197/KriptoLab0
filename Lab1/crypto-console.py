@@ -12,7 +12,7 @@ import random
 from crypto import (encrypt_caesar, decrypt_caesar,
                     encrypt_vigenere, decrypt_vigenere,
                     generate_private_key, create_public_key,
-                    encrypt_mh, decrypt_mh)
+                    encrypt_mh, decrypt_mh, encrypt_scytale, decrypt_scytale)
 
 
 #############################
@@ -21,7 +21,7 @@ from crypto import (encrypt_caesar, decrypt_caesar,
 
 def get_tool():
     print("* Tool *")
-    return _get_selection("(C)aesar, (V)igenere or (M)erkle-Hellman? ", "CVM")
+    return _get_selection("(C)aesar, (V)igenere, (M)erkle-Hellman? or (S)cytale  ", "CVMS")
 
 
 def get_action():
@@ -102,6 +102,13 @@ def clean_caesar(text):
 def clean_vigenere(text):
     return ''.join(ch for ch in text.upper() if ch.isupper())
 
+def clean_scytale(text):
+    """Convert text to a form compatible with the preconditions imposed by Scytale cipher"""
+    return text.upper()
+
+def clean_circumference(circumference):
+    
+    return int(circumference)
 
 def run_caesar():
     action = get_action()
@@ -160,6 +167,19 @@ def run_merkle_hellman():
 
     set_output(output)
 
+def run_scytale():
+
+    action = get_action()
+    encrypting = action == 'E'
+    data = clean_scytale(get_input(binary=False))
+
+    print("* Transform *")
+    circumference = clean_circumference(input("Circumference? "))
+    print("{}crypting {} using Scytale cipher...".format('En' if encrypting else 'De', data))
+
+    output = (encrypt_scytale if encrypting else decrypt_scytale)(data, circumference)
+
+    set_output(output)
 
 def run_suite():
     """
@@ -175,7 +195,8 @@ def run_suite():
     commands = {
         'C': run_caesar,         # Caesar Cipher
         'V': run_vigenere,       # Vigenere Cipher
-        'M': run_merkle_hellman  # Merkle-Hellman Knapsack Cryptosystem
+        'M': run_merkle_hellman,  # Merkle-Hellman Knapsack Cryptosystem
+        'S': run_scytale          #Scytale Cipher 
     }
     commands[tool]()
 

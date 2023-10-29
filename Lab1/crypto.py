@@ -183,3 +183,44 @@ def decrypt_mh(message, private_key):
     """
     raise NotImplementedError  # Your implementation here
 
+# Scytale Cipher
+def fill_the_gap(plaintext, circumference):
+
+    while(len(plaintext) % circumference != 0):
+        plaintext += "_"
+
+    return plaintext
+
+def eliminate_the_gap(decrypted):
+    newDecrypted = ""
+    i = 0
+    while decrypted[i] != "_":
+        newDecrypted += decrypted[i]
+        i = i + 1
+    return newDecrypted
+
+def encrypt_scytale(plaintext, circumference):
+
+    #raise NotImplementedError  # Your implementation here
+    plaintext = fill_the_gap(plaintext, circumference)
+    encrypted = ""
+    for i in range(circumference):
+        j = i
+        while j < len(plaintext):
+            encrypted += plaintext[j]
+            j = j + circumference
+
+    return encrypted
+
+def decrypt_scytale(ciphertext, circumference):
+
+    steps = int(len(ciphertext)/circumference)
+    decrypted = ""
+    for i in range(steps):
+        j = i
+        while j < len(ciphertext):
+            decrypted += ciphertext[j]
+            j = j + steps
+    return eliminate_the_gap(decrypted)
+
+    #raise NotImplementedError  # Your implementation here
