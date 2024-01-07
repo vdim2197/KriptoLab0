@@ -1,0 +1,2 @@
+openssl s_client -connect www.bnr.ro:443 -showcerts
+keytool -import -trustcacerts -keystore "C:\Program Files\Java\jdk-21/lib/security/cacerts" -storepass changeit -alias bnr_cert -file bnr_certificate.crt
